@@ -1,1 +1,1 @@
-"# TradingService" 
+# TradingService
