@@ -1,0 +1,20 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.dsfinance.bank.common.interfaces;
+
+import java.util.ArrayList;
+
+/**
+ *
+ * @author markus
+ */
+public interface IDepot {
+	public ArrayList<String> getSymbols(int kundenId);   
+        public int newSymbol(int kundenId, String symbol,int quantity);
+	public int getQuantity(int kundenId, String symbol);
+        public int setQuantity(int kundenId, String symbol);
+
+}

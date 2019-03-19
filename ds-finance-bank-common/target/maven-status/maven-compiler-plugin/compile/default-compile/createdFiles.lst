@@ -1,0 +1,10 @@
+com\fostw\dsfinance\bank\common\exceptions\InvalidRemoteMethodParameterException.class
+com\fostw\dsfinance\bank\common\models\Spielgeld.class
+com\fostw\dsfinance\bank\common\interfaces\IBank.class
+com\fostw\dsfinance\bank\common\interfaces\IShare.class
+com\fostw\dsfinance\bank\common\models\Share.class
+com\fostw\dsfinance\bank\common\models\User.class
+com\fostw\dsfinance\bank\common\interfaces\IUser.class
+com\fostw\dsfinance\bank\common\exceptions\SecurityException.class
+com\fostw\dsfinance\bank\common\interfaces\ISpielgeld.class
+com\fostw\dsfinance\bank\common\exceptions\PermissionDeniedException.class

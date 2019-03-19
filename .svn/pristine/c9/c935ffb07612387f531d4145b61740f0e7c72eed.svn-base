@@ -1,0 +1,39 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank.entity;
+import com.fostw.dsfinance.bank.common.interfaces.ISpielgeldDAO;
+/**
+ *
+ * @author markus
+ */
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+public class SpielgeldDAO implements ISpielgeldDAO {
+       final private String ID = "1";
+       @PersistenceContext
+    private EntityManager entityManager;
+    
+    @Override
+    public Spielgeld getSpielgeld() {
+
+        return entityManager.find(Spielgeld.class, ID);
+}
+    @Override
+    public void setSpielgeld(Spielgeld spielgeld) {
+        entityManager.persist(spielgeld);
+    }
+    
+     /*The main intention of the merge method is to update a persistent entity 
+    instance with new field values from a detached entity instance.
+    */
+    @Override
+    public void mergeSpielgeld(Spielgeld spielgeld) {
+        entityManager.merge(spielgeld);
+    }
+
+
+}

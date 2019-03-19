@@ -1,0 +1,16 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+import com.fostw.ejb.bank.entity.Spielgeld;
+/**
+ *
+ * @author markus
+ */
+public interface ISpielgeldDAO {
+    
+    public Spielgeld getSpielgeld();
+    public void setSpielgeld(Spielgeld spielgeld);
+    public void mergeSpielgeld(Spielgeld spielgeld);
+}

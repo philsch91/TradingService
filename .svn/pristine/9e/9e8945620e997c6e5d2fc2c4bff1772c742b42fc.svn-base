@@ -1,0 +1,75 @@
+package net.froihofer.dsfinance.bank.client;
+
+import com.fostw.dsfinance.bank.Credential;
+import com.fostw.dsfinance.bank.ui.console.LoginForm;
+import com.fostw.dsfinance.bank.common.interfaces.*;
+import java.math.BigDecimal;
+import java.util.Properties;
+import java.util.logging.Level;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import net.froihofer.util.AuthCallbackHandler;
+import net.froihofer.util.JBoss7JndiLookupHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Main class for starting the bank client.
+ *
+ */
+public class BankClient {
+  private static Logger log = LoggerFactory.getLogger(BankClient.class);
+  
+  public static void main(String[] args) {
+      
+    LoginForm loginForm = new LoginForm();
+    Credential cred = loginForm.show();
+    if(cred==null){
+        System.out.println("wrong username or password");
+        return;
+    }
+      
+    //AuthCallbackHandler.setUsername("customer");
+    //AuthCallbackHandler.setPassword("customerpass");
+    AuthCallbackHandler.setUsername(cred.getUsername());
+    AuthCallbackHandler.setPassword(cred.getPassword());
+    
+    Properties props = new Properties();
+    props.put(Context.SECURITY_PRINCIPAL,AuthCallbackHandler.getUsername());
+    props.put(Context.SECURITY_CREDENTIALS,AuthCallbackHandler.getPassword());
+    props.put("jboss.naming.client.ejb.context", true);
+    try {
+        JBoss7JndiLookupHelper jndiHelper = new JBoss7JndiLookupHelper(new InitialContext(props), "ds-finance-bank-ear", "ds-finance-bank-ejb", "");
+        //TODO: Implement the rest of the functionality
+        IBank bank = (IBank) jndiHelper.lookup("BankService", IBank.class);
+        
+        Boolean isEmployee=bank.checkEmployee();
+        System.out.println("isEmployee: " + isEmployee.toString());
+        
+        BigDecimal spielgeld = bank.getSpielgeld();
+        System.out.println("+++++++++Derzeitiges Spielgeld: " + spielgeld +"€ ++++++++");
+        
+        String currLogin = bank.getLoginName();
+        System.out.println("Derzeitiges Eingelogged: " + currLogin);
+        IUser user=null;
+        try {
+            user = bank.searchCustomer("philipp2");
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(BankClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(user==null){
+          System.out.println("user not in db");
+          try {
+              bank.newCustomer("philipp2", "Philipp","Schunker","Gran Via Madrid");
+          } catch (Exception ex) {
+              java.util.logging.Logger.getLogger(BankClient.class.getName()).log(Level.SEVERE, null, ex);
+          }
+        }
+    }catch (NamingException e) {
+      log.error("Failed to initialize InitialContext.",e);
+    }
+    System.out.println("Hello World");
+  }
+}

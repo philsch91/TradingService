@@ -1,0 +1,85 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.dsfinance.bank.common.models;
+
+import com.fostw.dsfinance.bank.common.interfaces.IShare;
+import java.io.Serializable;
+
+/**
+ *
+ * @author A4938
+ */
+public class Share implements Serializable,IShare{
+    private Long id;
+    private String symbol;
+    private String company;
+    private double price;
+    private double currentPrice;
+    private int quantity;
+    
+    public Share(){}
+
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getSymbol() {
+        return symbol;
+    }
+
+    @Override
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    @Override
+    public Double getPrice() {
+        return price;
+    }
+
+    @Override
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public double getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(double currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    @Override
+    public int getQuantity(){
+        return this.quantity;
+    }
+
+    @Override
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+    
+    @Override
+    public String toString(){
+        return this.symbol + " " + this.price + " " + Integer.toString(this.quantity);
+    }
+}

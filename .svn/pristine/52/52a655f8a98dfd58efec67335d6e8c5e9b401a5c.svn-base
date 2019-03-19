@@ -1,0 +1,94 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank.entity;
+
+
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import com.fostw.dsfinance.bank.common.interfaces.IDepot;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+
+/**
+ *
+ * @author markus
+ */
+@Entity
+@Table(name = "Depot")
+public class Depot implements Serializable, IDepot {
+
+   @Id
+   @GeneratedValue(strategy = GenerationType.AUTO)
+   private String id ;
+   
+   @Column(name = "Symbol")
+   private String symbol;
+ 
+   @Column(name = "Quantity")
+   private int quantity;
+   
+   //@Column(name = "KundenID ")
+   //private int kundenId;
+   
+   @ManyToOne
+   @JoinColumn(name = "KundenID ")
+   private Customer kundenId;
+   
+//   ID (INT)
+
+   
+   public Depot(){
+   }
+   
+   public Depot(String symbol, int quantity){
+        this.quantity = quantity; 
+        this.symbol = symbol; 
+   }
+   
+    public Customer getKundenID(){
+        return kundenId;
+    }
+        
+    public void setKundenId(Customer kundenId){
+        this.kundenId = kundenId; 
+    }
+
+    /**
+     *
+     * @return
+     */
+   @Override
+    public int getQuantity(){
+        return quantity;
+        }
+        
+    /**
+     *
+     * @param quantity
+     */
+   @Override
+        public void setQuantity(int quantity){
+            this.quantity = quantity; 
+        }
+        
+   @Override
+	public String getSymbol(){
+            return symbol;
+        }
+        
+  
+   @Override
+        public void setSymbol(String symbol){
+            this.symbol = symbol; 
+        }
+        
+}
+

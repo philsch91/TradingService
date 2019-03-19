@@ -1,0 +1,30 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.dsfinance.bank.common.interfaces;
+
+import java.math.BigDecimal;
+import java.util.List;
+import javax.ejb.Remote;
+
+/**
+ *
+ * @author A4938
+ */
+@Remote
+public interface IBank {
+    public int newCustomer(String firstName, String lastName, String address) throws Exception;
+    /*public List<Customer> searchCustomer(String vorname) throws Exception;
+    public List<Customer> searchCustomer(String nachname) throws Exception;
+    public List<Customer> searchCustomer(String vorname, String nachname) throws Exception;
+    public void buyShares(String shareID, int shareNumber) throws Exception;
+    public void sellShares(String shareID, int shareNumber) throws Exception;   //ShareNotAvailableException,PermissionDeniedException;
+    public List<Share> searchShare(String shareName) throws Exception;
+    public List<Depot> getDepot() throws Exception;*/
+    public String getLoginName();
+    public boolean authenticate(int ID, String password);
+    public boolean checkEmployee();
+    public BigDecimal getSpielgeld() throws Exception;
+}

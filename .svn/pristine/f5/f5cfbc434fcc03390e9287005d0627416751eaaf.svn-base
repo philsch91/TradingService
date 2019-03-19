@@ -1,0 +1,223 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank;
+
+import com.fostw.dsfinance.bank.common.interfaces.*;
+import com.fostw.dsfinance.bank.common.models.Share;
+import com.fostw.dsfinance.bank.common.models.User;
+import com.fostw.ejb.Log;
+import com.fostw.ejb.bank.entity.Customer;
+import com.fostw.ejb.bank.entity.CustomerDAO;
+import com.fostw.ejb.bank.entity.DepotDAO;
+import com.fostw.ejb.bank.entity.Employee;
+import com.fostw.ejb.bank.entity.EmployeeDAO;
+import com.fostw.ejb.bank.entity.Spielgeld;
+import com.fostw.ejb.bank.entity.SpielgeldDAO;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
+import javax.ejb.SessionContext;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.xml.ws.BindingProvider;
+import net.froihofer.dsfinance.ws.trading.PublicStockQuote;
+import net.froihofer.dsfinance.ws.trading.TradingWSException_Exception;
+import net.froihofer.dsfinance.ws.trading.TradingWebService;
+import net.froihofer.dsfinance.ws.trading.TradingWebServiceService;
+import net.froihofer.util.jboss.WildflyAuthDBHelper;
+
+/**
+ *
+ * @author A4938
+ */
+@Stateless(name="BankService")
+@PermitAll
+public class Bank implements IBank {
+    @Resource
+    SessionContext context;
+    TradingWebService webservice;
+    
+    @Inject
+    SpielgeldDAO spielgeldDAO;
+    @Inject
+    CustomerDAO customerDAO;
+    @Inject
+    DepotDAO depotDAO;
+    @Inject
+    EmployeeDAO employeeDAO;
+    
+    @PostConstruct
+    private void initBank(){
+        this.initSpielgeld();
+        this.createFirstEmployee();
+        this.initTradingService();
+    }
+    
+    private void initSpielgeld(){
+        System.out.println("initSpielgeld");
+        /*
+        Log log = Log.Open("C:\\logs\\bank.log");
+        log.write("initSpielgeld");
+        */
+        
+        Spielgeld sg = null;
+        if((sg=spielgeldDAO.getSpielgeld("1"))==null){
+            System.out.println("set initial Spielgeld value");
+            Spielgeld spielgeld = new Spielgeld();
+            spielgeld.setMoney(BigDecimal.valueOf(1000000000));
+            spielgeldDAO.persistSpielgeld(spielgeld);
+            sg=spielgeldDAO.getSpielgeld("1");
+        }
+        System.out.println("Bank Spielgeld: " + sg.getMoney().toString());
+        
+    }
+    
+    private void createFirstEmployee(){
+        System.out.println("createFirstEmployee");
+        Employee e = new Employee();
+        e.setId(Long.getLong("1"));
+        e.setUserName("manager");
+        e.setFirstName("manager");
+        e.setLastName("manager");
+        e.setAddress("");
+        Employee foundEmployee=this.employeeDAO.getEmployee(e.getUserName());
+        if(foundEmployee==null){
+            System.out.println("persist employee with username " + e.getUserName());
+            this.employeeDAO.persistEmployee(e);
+        }
+        
+        WildflyAuthDBHelper whelper = new WildflyAuthDBHelper(new File("C:\\Program Files\\NetBeans 8.2\\wildfly-10.1.0.Final"));
+        try {
+            whelper.addUser("manager", "manager", new String[0]);
+        } catch (IOException ex) {
+            Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void initTradingService(){
+        TradingWebServiceService tradingWebService=null;
+        try {
+            tradingWebService = new TradingWebServiceService(new URL("http://edu.dedisys.org/ds-finance/ws/TradingService?wsdl"));
+            this.webservice = (TradingWebService)tradingWebService.getTradingWebServicePort();
+        } catch (MalformedURLException mex) {
+            Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, mex);
+        } catch (NullPointerException nex){
+            Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, nex);
+        }
+        
+        BindingProvider bindingProvider = (BindingProvider) this.webservice;
+        bindingProvider.getRequestContext()
+                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://edu.dedisys.org/ds-finance/ws/TradingService");
+        bindingProvider.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ittb19bb_06");
+        bindingProvider.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "teeD8shu");
+    }
+    
+    @PermitAll
+    @Override
+    public int newCustomer(String userName, String firstName, String lastName, String address) throws Exception{
+        System.out.println("---New Customer---");
+        Customer customer = new Customer();
+        customer.setUserName(userName);
+        customer.setFirstName(firstName);
+        customer.setLastName(lastName);
+        customer.setAddress(address);
+        this.customerDAO.persistCustomer(customer);
+        return 0;
+    }
+    
+    @PermitAll
+    @Override
+    public IUser searchCustomer(String userName){
+        System.out.println("---Search Customer---");
+        Customer customer = this.customerDAO.getCustomer(userName);
+        return customer;
+    }
+    
+    @PermitAll
+    @Override
+    public List<IUser> searchCustomer(String firstname, String lastname) throws Exception{
+        System.out.println("---SearchCustomer---");
+        List<Customer> customerList = this.customerDAO.findCustomer(firstname, lastname);
+        List<IUser> customers = new ArrayList<>(customerList.size());
+        for(Customer c : customerList){
+            IUser user = new User();
+            user.setId(c.getId());
+            user.setUserName(c.getUserName());
+            user.setFirstName(c.getFirstName());
+            user.setLastName(c.getLastName());
+            //user.setAddress(c.getAddress());
+            customers.add(user);
+        }
+        return customers;
+    }
+    
+    @PermitAll
+    @Override
+    public void buyShares(Long userId, String shareId, int shareNumber) throws Exception{
+        return;
+    }
+    public void sellShares(String shareId, int shareNumber) throws Exception{
+        return;
+    }
+    @Override
+    public List<Share> searchShare(String symbolName) throws Exception{
+        List<Share> shareList = null;
+        List<PublicStockQuote> psqList = null;
+        //TODO: replace empty string with list of all available shares
+        try{
+            psqList = this.webservice.findStockQuotesByCompanyName(symbolName);
+        }catch(TradingWSException_Exception te){
+            Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, te);
+        }catch(Exception e){
+            Logger.getLogger(Bank.class.getName()).log(Level.SEVERE, null, e);
+        }
+        System.out.println(Integer.toString(psqList.size()));
+        shareList = new ArrayList<>(psqList.size());
+        for(PublicStockQuote psq : psqList){
+            if(psq.getSymbol() != null && psq.getLastTradePrice() != null && psq.getFloatShares() != null){
+                Share share = new Share();
+                share.setCompany(psq.getCompanyName());
+                share.setSymbol(psq.getSymbol());
+                share.setPrice(psq.getLastTradePrice().doubleValue());
+                share.setCount(psq.getFloatShares());
+                
+                shareList.add(share);
+            }
+        }
+        return shareList;
+    }
+    public List<IDepot> getDepot() throws Exception{
+        return null;
+    }
+    public String getLoginName(){
+        return context.getCallerPrincipal().getName();
+    }
+    public boolean authenticate(int ID, String password){
+        return true;
+    }
+    public boolean checkEmployee(){
+        String username = context.getCallerPrincipal().getName();
+        Employee employee = this.employeeDAO.getEmployee(username);
+        if(employee==null){
+            return false;
+        }
+        return true;
+    }
+    public BigDecimal getSpielgeld(){
+        Spielgeld spielgeld = spielgeldDAO.getSpielgeld("1");
+        return spielgeld.getMoney();
+    }
+    
+}

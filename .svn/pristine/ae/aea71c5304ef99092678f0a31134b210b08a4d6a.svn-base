@@ -1,0 +1,91 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.dsfinance.bank.ui.console;
+
+import com.fostw.dsfinance.bank.common.interfaces.IBank;
+import com.fostw.dsfinance.bank.common.interfaces.IDepot;
+import com.fostw.dsfinance.bank.common.interfaces.IUser;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.froihofer.dsfinance.bank.client.BankClient;
+
+/**
+ *
+ * @author A4938
+ */
+public class ConsoleUI {    
+    
+    private IBank bank = null;
+    
+    public ConsoleUI(IBank bank){
+        this.bank=bank;
+    }
+    
+    public IBank getBank() {
+        return bank;
+    }
+
+    public void setBank(IBank bank) {
+        this.bank = bank;
+    }
+    
+    public void show(){
+        //TODO: create menu depending on user type
+        Menu menu = new Menu();
+        menu.setTitel("Bank Client Main Menu");
+        menu.insert("Search Stock");
+        menu.insert("Buy Stock");
+        menu.insert("Sell Stock");
+        if(bank.checkEmployee()){
+            menu.insert("Search Customer");
+            menu.insert("Create Customer");
+            menu.insert("Show Bank Volume");
+        }
+        int option=menu.show();
+        if(option==1){
+            String name="";
+            name = new TextBox("Share name").show();
+            List<IDepot> shares = new ArrayList<>();
+            try {
+                 //= this.bank.searchShare(name);
+                 shares = this.bank.searchShare(name);
+            } catch (Exception ex) {
+                Logger.getLogger(ConsoleUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            for(IDepot share : shares){
+                System.out.println(share.getSymbol());
+            }
+        }else if(option==5){
+            System.out.println("New Customer:");
+            //String s = new TextBox("ID", TextBoxInputType.NUMBER).show();
+            String username = new TextBox("Username").show();
+            String firstname = new TextBox("Firstname").show();
+            String lastname = new TextBox("Lastname").show();
+            String address = new TextBox("Lastname").show();
+            IUser user=null;
+            try {
+                user = bank.searchCustomer(username);
+            } catch (Exception ex) {
+                java.util.logging.Logger.getLogger(BankClient.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if(user==null){
+                try {
+                    this.bank.newCustomer(username, firstname, lastname, address);
+                } catch (Exception ex) {
+                    Logger.getLogger(ConsoleUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+    
+    /*
+    private void searchStockMenu(){
+        
+    }*/
+    
+}

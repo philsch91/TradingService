@@ -1,0 +1,99 @@
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank.entity;
+
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+/**
+ *
+ * @author markus
+ */
+public class CustomerDAO extends UserDAO{
+    
+    public Customer getCustomer(Long id) {
+        return this.entityManager.find(Customer.class, id);
+    }
+    
+    public Customer getCustomer(String username){
+        System.out.println("get customer " + username);
+        Query query = this.entityManager.createQuery("select u from Customer u "
+                        + "where u.userName = :pUsername",Customer.class);
+        query.setParameter("pUsername", username);
+        List<Customer> clist = query.getResultList();
+        if(clist.isEmpty()){
+            System.out.println("no user found");
+            return null;
+        }
+        if(clist.size()>1){
+            System.out.println("multiple users with same username found");
+            return null;
+        }
+        for(Customer c : clist){
+            if(c.getUserName().equals(username)){
+                return c;
+            }
+        }
+        return null;
+    }
+    
+    public List<Customer> findCustomer(String firstname, String lastname){
+        System.out.println("find customer");
+        firstname=firstname.toLowerCase();
+        lastname=lastname.toLowerCase();
+        String sqlStatement="select c from Customer c";
+        String sqlCondition="";
+        HashMap<String,String> parameters = new HashMap<String,String>();
+        if(firstname!="" && lastname!=""){
+            sqlCondition="where lower(c.firstName) like :pFirstname and lower(c.lastName) like :pLastname"
+                    +" and c.employee=0";
+            parameters.put("pFirstname", firstname);
+            parameters.put("pLastname", lastname);
+        }else if(firstname!=""){
+            sqlCondition="where lower(c.firstName) like :pFirstname and c.employee=0";
+            parameters.put("pFirstname", firstname);
+        }else if(lastname!=""){
+            sqlCondition="where lower(c.lastName) like :pLastname and c.employee=0";
+            parameters.put("pLastname", lastname);
+        }else{
+            sqlCondition="where c.employee=0";
+        }
+        sqlStatement=sqlStatement + " " + sqlCondition;
+        Query query = this.entityManager.createQuery(sqlStatement,Customer.class);
+        /*
+        Iterator iterator = parameters.entrySet().iterator();
+        while(iterator.hasNext()){
+            Map.Entry kvp = (Map.Entry)iterator.next();
+            iterator.remove();
+        }*/
+        for(Map.Entry<String, String> kvp : parameters.entrySet()){
+            System.out.println(kvp.getKey() + "-"+kvp.getValue());
+            query.setParameter(kvp.getKey(), "%"+kvp.getValue()+"%");
+        }
+        List<Customer> clist = query.getResultList();
+        if(clist.isEmpty()){
+            System.out.println("no user found");
+            return null;
+        }
+        return clist;
+    }
+    
+    public void persistCustomer(Customer customer){
+        this.entityManager.merge(customer);
+    }
+    
+    public void deleteCustomer(Customer customer){
+        this.entityManager.remove(customer);
+    }
+}

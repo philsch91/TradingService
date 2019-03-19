@@ -1,0 +1,74 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank.entity;
+
+
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import com.fostw.dsfinance.bank.common.interfaces.IDepot;
+import java.util.ArrayList;
+
+/**
+ *
+ * @author markus
+ */
+@Entity
+@Table(name = "Depot")
+public class Depot implements Serializable, IDepot {
+
+   @Id
+   private String id ;
+   
+   @Column(name = "Symbol")
+   private String symbol;
+ 
+   @Column(name = "Quantity")
+   private int quantity;
+   
+   @Column(name = "KundenID ")
+   private int kundenId;
+   
+//   ID (INT)
+
+   
+   public Depot(){
+       
+   }
+   
+    
+   @Override
+   	public ArrayList<String> getSymbols(int kundenId){
+            return null;
+}  
+      
+    /**
+     *
+     * @param kundenId
+     * @param symbol
+     * @return
+     */
+    @Override
+	public int getQuantity(int kundenId, String symbol){
+            
+            return 0;
+        }
+        
+    /**
+     *
+     * @param kundenId
+     * @param symbol
+     * @param quantity
+     */
+    @Override
+        public void setQuantity(int kundenId, String symbol,int quantity){
+                        
+        }
+}
+
+  

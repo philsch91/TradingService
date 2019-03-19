@@ -1,0 +1,101 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank;
+
+import com.fostw.dsfinance.bank.common.interfaces.IBank;
+import com.fostw.dsfinance.bank.common.interfaces.IDepot;
+import com.fostw.dsfinance.bank.common.interfaces.IUser;
+import com.fostw.ejb.Log;
+import com.fostw.ejb.bank.entity.CustomerDAO;
+import com.fostw.ejb.bank.entity.DepotDAO;
+import com.fostw.ejb.bank.entity.Spielgeld;
+import com.fostw.ejb.bank.entity.SpielgeldDAO;
+import java.math.BigDecimal;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
+import javax.ejb.SessionContext;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import net.froihofer.dsfinance.ws.trading.TradingWebService;
+
+/**
+ *
+ * @author A4938
+ */
+@Stateless(name="BankService")
+@PermitAll
+public class Bank implements IBank {
+    @Resource
+    SessionContext context;
+    TradingWebService webservice;
+    
+    @Inject
+    SpielgeldDAO spielgeldDAO;
+    @Inject
+    CustomerDAO customerDAO;
+    @Inject
+    DepotDAO depotDAO;
+    
+    @PostConstruct
+    private void initBank(){
+        initSpielgeld();
+    }
+    
+    private void initSpielgeld(){
+        System.out.println("initSpielgeld");
+        Log log = new Log("C:\\Users\\A4938.PAD01\\Desktop\\bank.log");
+        log.write("initSpielgeld");
+        
+        Spielgeld sg = null;
+        if((sg=spielgeldDAO.getSpielgeld("1"))==null){
+            System.out.println("set initial Spielgeld value");
+            Spielgeld spielgeld = new Spielgeld();
+            spielgeld.setMoney(BigDecimal.valueOf(1000000000));
+            spielgeldDAO.persistSpielgeld(spielgeld);
+            sg=spielgeldDAO.getSpielgeld("1");
+        }
+        System.out.println("Bank Spielgeld: " + sg.getMoney().toString());
+        
+    }
+    
+    public int newCustomer(String firstName, String lastName, String address) throws Exception{
+        return 0;
+    }
+    public List<IUser> searchCustomer(String name) throws Exception{
+        return null;
+    }
+    public List<IUser> searchCustomer(String vorname, String nachname) throws Exception{
+        return null;
+    }
+    public void buyShares(String shareID, int shareNumber) throws Exception{
+        return;
+    }
+    public void sellShares(String shareID, int shareNumber) throws Exception{
+        return;
+    }
+    public List<String> searchShare(String symbolName) throws Exception{
+        return null;
+    }
+    public List<IDepot> getDepot() throws Exception{
+        return null;
+    }
+    public String getLoginName(){
+        return null;
+    }
+    public boolean authenticate(int ID, String password){
+        return true;
+    }
+    public boolean checkEmployee(){
+        return true;
+    }
+    public BigDecimal getSpielgeld() throws Exception{
+        Spielgeld spielgeld = new Spielgeld();
+        return spielgeld.getMoney();
+    }
+    
+}

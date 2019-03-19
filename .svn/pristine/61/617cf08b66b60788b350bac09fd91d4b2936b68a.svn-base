@@ -1,0 +1,125 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank;
+
+import com.fostw.dsfinance.bank.common.interfaces.*;
+import com.fostw.ejb.Log;
+import com.fostw.ejb.bank.entity.Customer;
+import com.fostw.ejb.bank.entity.CustomerDAO;
+import com.fostw.ejb.bank.entity.DepotDAO;
+import com.fostw.ejb.bank.entity.Employee;
+import com.fostw.ejb.bank.entity.EmployeeDAO;
+import com.fostw.ejb.bank.entity.Spielgeld;
+import com.fostw.ejb.bank.entity.SpielgeldDAO;
+import java.math.BigDecimal;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
+import javax.ejb.SessionContext;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import net.froihofer.dsfinance.ws.trading.TradingWebService;
+
+/**
+ *
+ * @author A4938
+ */
+@Stateless(name="BankService")
+@PermitAll
+public class Bank implements IBank {
+    @Resource
+    SessionContext context;
+    TradingWebService webservice;
+    
+    @Inject
+    SpielgeldDAO spielgeldDAO;
+    @Inject
+    CustomerDAO customerDAO;
+    @Inject
+    DepotDAO depotDAO;
+    @Inject
+    EmployeeDAO employeeDAO;
+    
+    @PostConstruct
+    private void initBank(){
+        initSpielgeld();
+    }
+    
+    private void initSpielgeld(){
+        System.out.println("initSpielgeld");
+        /*
+        Log log = Log.Open("C:\\logs\\bank.log");
+        log.write("initSpielgeld");
+        */
+        
+        Spielgeld sg = null;
+        if((sg=spielgeldDAO.getSpielgeld("1"))==null){
+            System.out.println("set initial Spielgeld value");
+            Spielgeld spielgeld = new Spielgeld();
+            spielgeld.setMoney(BigDecimal.valueOf(1000000000));
+            spielgeldDAO.persistSpielgeld(spielgeld);
+            sg=spielgeldDAO.getSpielgeld("1");
+        }
+        System.out.println("Bank Spielgeld: " + sg.getMoney().toString());
+        
+    }
+    
+    @PermitAll
+    @Override
+    public int newCustomer(String userName, String firstName, String lastName, String address) throws Exception{
+        System.out.println("---New Customer---");
+        Customer customer = new Customer();
+        customer.setUserName(userName);
+        customer.setFirstName(firstName);
+        customer.setLastName(lastName);
+        customer.setAddress(address);
+        this.customerDAO.persistCustomer(customer);
+        return 0;
+    }
+    
+    @PermitAll
+    @Override
+    public IUser searchCustomer(String userName){
+        System.out.println("---Search Customer---");
+        Customer customer = this.customerDAO.getCustomer(userName);
+        return customer;
+    }
+    public List<IUser> searchCustomer(String vorname, String nachname) throws Exception{
+        return null;
+    }
+    public void buyShares(String shareID, int shareNumber) throws Exception{
+        return;
+    }
+    public void sellShares(String shareID, int shareNumber) throws Exception{
+        return;
+    }
+    public List<String> searchShare(String symbolName) throws Exception{
+        return null;
+    }
+    public List<IDepot> getDepot() throws Exception{
+        return null;
+    }
+    public String getLoginName(){
+        return context.getCallerPrincipal().getName();
+    }
+    public boolean authenticate(int ID, String password){
+        return true;
+    }
+    public boolean checkEmployee(){
+        String username = context.getCallerPrincipal().getName();
+        Employee employee = this.employeeDAO.getEmployee(username);
+        if(employee==null){
+            return false;
+        }
+        return true;
+    }
+    public BigDecimal getSpielgeld(){
+        Spielgeld spielgeld = spielgeldDAO.getSpielgeld("1");
+        return spielgeld.getMoney();
+    }
+    
+}

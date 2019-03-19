@@ -1,0 +1,73 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package net.froihofer.dsfinance.bank.client;
+
+import com.fostw.dsfinance.bank.Credential;
+import com.fostw.dsfinance.bank.ui.console.LoginForm;
+import com.fostw.dsfinance.bank.common.interfaces.*;
+import com.fostw.dsfinance.bank.common.models.*;
+import java.math.BigDecimal;
+import java.util.Properties;
+import java.util.logging.Level;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import net.froihofer.util.AuthCallbackHandler;
+import net.froihofer.util.JBoss7JndiLookupHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+/**
+ *
+ * @author KF
+ */
+public class BankClientMenu {
+    
+    private IBank _Bank;
+    private IUser _User;
+    private Spielgeld _Spielgeld;
+    
+    public BankClientMenu(IBank bank)
+    {
+        this._Bank = bank;
+    }
+    
+    public void Start()
+    {
+        
+    try 
+    {
+        _User = _Bank.searchCustomer(_Bank.getLoginName());
+    }
+    catch (Exception ex) 
+    {
+       java.util.logging.Logger.getLogger(BankClient.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    
+    Boolean isEmployee=_Bank.checkEmployee();
+      System.out.println("isEmployee: " + isEmployee.toString());
+      BigDecimal spielgeldValue = _Bank.getSpielgeld();
+      _Spielgeld = new Spielgeld();
+      _Spielgeld.setMoney(spielgeldValue);
+      System.out.println("+++++++++Derzeitiges Spielgeld: " + _Spielgeld.getMoney() +"€ ++++++++");
+      String currLogin = _Bank.getLoginName();
+      System.out.println("Derzeitiges Eingelogged: " + currLogin);
+    
+     
+      if(_User ==null){
+          System.out.println("user not in db");
+          try {
+              _Bank.newCustomer("philipp2", "Philipp","Schunker","Gran Via Madrid");
+          } catch (Exception ex) {
+              java.util.logging.Logger.getLogger(BankClient.class.getName()).log(Level.SEVERE, null, ex);
+          }
+      }
+    }
+    
+    
+    
+}

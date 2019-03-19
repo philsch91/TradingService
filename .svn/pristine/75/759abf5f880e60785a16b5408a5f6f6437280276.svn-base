@@ -1,0 +1,68 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank.entity;
+
+/**
+ *
+ * @author markus
+ */
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.List;
+
+
+public class DepotDAO implements IDepotDAO{
+    @PersistenceContext
+    private EntityManager entityManager;
+       
+    @Override
+    public Depot getDepot(String ID) {
+        return entityManager.find(Depot.class, ID);
+    }
+    
+    @Override
+    public void persistDepot(Depot depot){
+        entityManager.merge(depot);
+    }
+    
+    /**
+     *
+     * @param depot
+     */
+    @Override
+        public void deleteDepot (Depot depot){
+        entityManager.remove(depot);
+    }
+    
+    /**
+     *
+     * @param symbol
+     * @param ID
+     * @return
+     */
+    public Depot getDepotUserSymbol(String symbol, int ID) {
+        try {
+            Depot depot = entityManager.createQuery("SELECT a FROM Depot a WHERE a.KundenID.id = " + ID + " AND a.Symbol = :symbol", Depot.class).setParameter("symbol", symbol).getSingleResult();
+            if (depot != null) {
+                return depot;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+   }
+   //Find customer's shares -> returns List with Shares
+   
+   public List<Depot> getUserDepot(int ID){
+       //
+       //System.out.println("DepotDAO---getDepot");
+       return entityManager.createQuery("SELECT a FROM Depot a Where a.KundenID.ID =:user", Depot.class).setParameter("KundenId", ID).getResultList();
+   }
+    
+    
+}
+    

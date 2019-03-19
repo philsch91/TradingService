@@ -1,0 +1,11 @@
+com\fostw\dsfinance\bank\ui\console\SelectionMenu.class
+com\fostw\dsfinance\bank\ui\console\TextBox.class
+com\fostw\dsfinance\bank\Credential.class
+com\fostw\dsfinance\bank\ui\console\ConsoleUI.class
+com\fostw\dsfinance\bank\ui\console\LoginForm.class
+com\fostw\dsfinance\bank\ui\console\ObjectListView.class
+net\froihofer\util\AuthCallbackHandler.class
+com\fostw\dsfinance\bank\ui\console\TextBoxInputType.class
+com\fostw\dsfinance\bank\ui\console\Menu.class
+net\froihofer\dsfinance\bank\client\BankClient.class
+net\froihofer\util\JBoss7JndiLookupHelper.class

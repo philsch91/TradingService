@@ -1,0 +1,58 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
+/**
+ *
+ * @author A4938
+ */
+public class Log {
+    
+    Path path=null;
+    public Log(String filename){
+        this.path=Paths.get(filename);
+    }
+        
+    public Boolean write(String text){
+        try {
+            Files.write(this.path, text.getBytes(),StandardOpenOption.APPEND);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        /*
+        try {
+            this.writer = new PrintWriter(this.filename,"UTF-8");
+        } catch (FileNotFoundException fe) {
+            //System.out.println(fe.getMessage());
+            //System.out.println(fe.getLocalizedMessage());
+            fe.printStackTrace();
+            return false;
+        } catch (UnsupportedEncodingException ue) {
+            //System.out.println(ue.getMessage());
+            ue.printStackTrace();
+            return false;
+        }
+        this.writer.println(text);
+        this.writer.close();
+        */
+        return true;
+    }
+}

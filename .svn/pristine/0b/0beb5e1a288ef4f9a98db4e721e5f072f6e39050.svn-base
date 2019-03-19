@@ -1,0 +1,45 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank.entity;
+
+
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+/**
+ *
+ * @author markus
+ */
+@Entity
+@Table(name = "Depot")
+public class Depot implements Serializable {
+
+   @Id
+   private String id ;
+   
+   @Column(name = "Symbol")
+   private String symbol;
+ 
+   @Column(name = "Quantity")
+   private int quantity;
+   
+   @Column(name = "KundenID ")
+   private int kundenId;
+   
+//   ID (INT)
+
+   
+   public Depot(){
+//somethink do do .....
+   }
+   
+    
+}
+
+  

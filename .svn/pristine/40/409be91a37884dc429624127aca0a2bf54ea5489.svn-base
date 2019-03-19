@@ -1,0 +1,36 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank.entity;
+
+/**
+ *
+ * @author markus
+ */
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+
+public class DepotDAO implements IDepotDAO{
+       @PersistenceContext
+    private EntityManager entityManager;
+    
+    @Override
+    public Depot getDepot(String ID) {
+        return entityManager.find(Depot.class, ID);
+    }
+    
+    @Override
+    public void deleteDepot (String ID){
+        entityManager.remove(ID);
+    }
+    
+    @Override
+    public void persistDepot(String ID){
+        entityManager.merge(ID);
+    }
+}
+    

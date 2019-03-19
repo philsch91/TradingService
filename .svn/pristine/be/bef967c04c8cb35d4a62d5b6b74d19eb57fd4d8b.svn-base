@@ -1,0 +1,58 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fostw.ejb.bank;
+
+import com.fostw.dsfinance.bank.common.interfaces.IBank;
+import com.fostw.ejb.bank.entity.CustomerDAO;
+import com.fostw.ejb.bank.entity.DepotDAO;
+import com.fostw.ejb.bank.entity.Spielgeld;
+import com.fostw.ejb.bank.entity.SpielgeldDAO;
+import java.math.BigInteger;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
+import javax.ejb.SessionContext;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import net.froihofer.dsfinance.ws.trading.TradingWebService;
+
+/**
+ *
+ * @author A4938
+ */
+@Stateless(name="BankService")
+@PermitAll
+public class Bank implements IBank {
+    @Resource
+    SessionContext context;
+    TradingWebService webservice;
+    
+    @Inject
+    SpielgeldDAO spielgeldDAO;
+    @Inject
+    CustomerDAO customerDAO;
+    @Inject
+    DepotDAO depotDAO;
+    
+    @PostConstruct
+    private void initBank(){
+        initSpielgeld();
+    }
+    
+    private void initSpielgeld(){
+        System.out.println("initSpielgeld");
+        Spielgeld sg = null;
+        if((sg=spielgeldDAO.getSpielgeld("1"))==null){
+            System.out.println("set initial Spielgeld value");
+            Spielgeld spielgeld = new Spielgeld();
+            spielgeld.setMoney(BigInteger.valueOf(1000000000));
+            spielgeldDAO.persistSpielgeld(spielgeld);
+            sg=spielgeldDAO.getSpielgeld("1");
+        }
+        System.out.println("Bank Spielgeld: " + sg.getMoney().toString());
+        
+    }
+}
